@@ -6,9 +6,6 @@ import threading
 from signal import signal, SIGINT
 from sys import exit
 
-
-
-
 #Stock object, each call to  constructor will make 1 API Call
 class Stock:
 	def __init__(self, ticker):
@@ -53,7 +50,7 @@ class Stock:
 
 def main():
 	#API key here
-	api_key = '5U7U9846S47BG8CE'
+	api_key = 'YOUR ALPHA VANTAGE API KEY'
 
 	#create our timeseries object 
 	ts = TimeSeries(key=api_key, output_format='pandas')

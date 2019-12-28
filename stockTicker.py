@@ -6,6 +6,16 @@ import threading
 from signal import signal, SIGINT
 from sys import exit
 
+#API key here
+api_key = '5U7U9846S47BG8CE'
+
+#create our timeseries object 
+ts = TimeSeries(key=api_key, output_format='pandas')
+
+
+symbols = ["INTC", "AMD", "MSFT"]
+stocks = [] #list of stock objects
+
 
 
 
@@ -52,15 +62,7 @@ class Stock:
 		os.system(changeString)
 
 def main():
-	#API key here
-	api_key = '5U7U9846S47BG8CE'
-
-	#create our timeseries object 
-	ts = TimeSeries(key=api_key, output_format='pandas')
-
-
-	symbols = ["INTC", "AMD", "MSFT"]
-	stocks = [] #list of stock objects
+	
 
 	# alpha vantage free api gives us 5 calls per minute, but we may not need that many
 	opsPerMin = min(5, len(symbols)) 
@@ -92,7 +94,6 @@ def main():
 def handler(signal_recieved, frame):
 	print("SIGINT or CTR_-C detected. Exiting")
 	exit(0)
-if __name__ == '__main___':
-	signal(SIGINT, handler)
-	main()
+
+main()
 

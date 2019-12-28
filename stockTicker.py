@@ -2,12 +2,12 @@ import os
 import pandas as pd
 from alpha_vantage.timeseries import TimeSeries
 import time
-import threading 
-#API key here
-api_key = '5U7U9846S47BG8CE'
+import threading
+from signal import signal, SIGINT
+from sys import exit
 
-#create our timeseries object 
-ts = TimeSeries(key=api_key, output_format='pandas')
+
+
 
 #Stock object, each call to  constructor will make 1 API Call
 class Stock:
@@ -51,36 +51,48 @@ class Stock:
 		os.system(tickerString)		
 		os.system(changeString)
 
+def main():
+	#API key here
+	api_key = '5U7U9846S47BG8CE'
 
-symbols = ["INTC", "AMD", "MSFT"]
-stocks = [] #list of stock objects
+	#create our timeseries object 
+	ts = TimeSeries(key=api_key, output_format='pandas')
 
-# alpha vantage free api gives us 5 calls per minute, but we may not need that many
-opsPerMin = min(5, len(symbols)) 
-def stockUpdater():
-	stockIndex = 0
-	numStocks = len(symbols)
+
+	symbols = ["INTC", "AMD", "MSFT"]
+	stocks = [] #list of stock objects
+
+	# alpha vantage free api gives us 5 calls per minute, but we may not need that many
+	opsPerMin = min(5, len(symbols)) 
+	def stockUpdater():
+		stockIndex = 0
+		numStocks = len(symbols)
+		while True:
+			i = 0
+			for i in range(opsPerMin):
+				if len(stocks) != len(symbols):
+					stocks.append(Stock(symbols[stockIndex])) # Making API Call, adding new stock to stocks
+				else:
+					stocks[stockIndex].update()
+				if stockIndex == len(symbols) -1 :
+					stockIndex = 0
+				else:
+					stockIndex +=1
+				i +=1
+			time.sleep(70)
+
+	dataThread = threading.Thread(target = stockUpdater)
+	dataThread.start()
 	while True:
-		i = 0
-		for i in range(opsPerMin):
-			if len(stocks) != len(symbols):
-				stocks.append(Stock(symbols[stockIndex])) # Making API Call, adding new stock to stocks
-			else:
-				stocks[stockIndex].update()
-			if stockIndex == len(symbols) -1 :
-				stockIndex = 0
-			else:
-				stockIndex +=1
-			i +=1
-		time.sleep(70)
+		for stock in stocks:
+			stock.printToMatrix()
+			time.sleep(1)
 
 
-
-dataThread = threading.Thread(target = stockUpdater)
-dataThread.start()
-while True:
-	for stock in stocks:
-		stock.printToMatrix()
-		time.sleep(1)
-
+def handler(signal_recieved, frame):
+	print("SIGINT or CTR_-C detected. Exiting")
+	exit(0)
+if __name__ == '__main___':
+	signal(SIGINT, handler)
+	main()
 

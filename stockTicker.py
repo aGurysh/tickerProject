@@ -67,31 +67,35 @@ def main():
 	opsPerMin = min(5, len(symbols)) 
 	def stockUpdater():
 		stockIndex = 0
-		while True:
-			i = 0
-			for i in range(opsPerMin):
-				if len(stocks) != len(symbols):
-					stocks.append(Stock(symbols[stockIndex])) # Making API Call, adding new stock to stocks
-				else:
-					stocks[stockIndex].update()
-				if stockIndex == len(symbols) -1 :
-					stockIndex = 0
-				else:
-					stockIndex +=1
-				i +=1
-			time.sleep(70)
+		try:
+			while True:
+				i = 0
+				for i in range(opsPerMin):
+					if len(stocks) != len(symbols):
+						stocks.append(Stock(symbols[stockIndex])) # Making API Call, adding new stock to stocks
+					else:
+						stocks[stockIndex].update()
+					if stockIndex == len(symbols) -1 :
+						stockIndex = 0
+					else:
+						stockIndex +=1
+					i +=1
+				time.sleep(60)
+		except: KeyboardInterrupt
 
 	dataThread = threading.Thread(target = stockUpdater)
 	dataThread.daemon = True
 	dataThread.start()
-	while True:
-		for stock in stocks:
-			stock.printToMatrix()
-			time.sleep(1)
+	try:
+		while True:
+			for stock in stocks:
+				stock.printToMatrix()
+	except: KeyboardInterrupt
+		
 
 
 def handler(signal_recieved, frame):
-	print("SIGINT or CTR_-C detected. Exiting")
+	print("SIGINT or CTRL-C detected. Exiting")
 	exit(0)
 
 if __name__ == '__main__':

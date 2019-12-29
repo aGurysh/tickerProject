@@ -67,30 +67,30 @@ def main():
 	opsPerMin = min(5, len(symbols)) 
 	def stockUpdater():
 		stockIndex = 0
-		try:
-			while True:
-				i = 0
-				for i in range(opsPerMin):
-					if len(stocks) != len(symbols):
-						stocks.append(Stock(symbols[stockIndex])) # Making API Call, adding new stock to stocks
-					else:
-						stocks[stockIndex].update()
-					if stockIndex == len(symbols) -1 :
-						stockIndex = 0
-					else:
-						stockIndex +=1
-					i +=1
-				time.sleep(60)
-		except: KeyboardInterrupt
+		
+		while True:
+			i = 0
+			for i in range(opsPerMin):
+				if len(stocks) != len(symbols):
+					stocks.append(Stock(symbols[stockIndex])) # Making API Call, adding new stock to stocks
+				else:
+					stocks[stockIndex].update()
+				if stockIndex == len(symbols) -1 :
+					stockIndex = 0
+				else:
+					stockIndex +=1
+				i +=1
+			time.sleep(60)
+	
 
 	dataThread = threading.Thread(target = stockUpdater)
 	dataThread.daemon = True
 	dataThread.start()
-	try:
-		while True:
-			for stock in stocks:
-				stock.printToMatrix()
-	except: KeyboardInterrupt
+	
+	while True:
+		for stock in stocks:
+			stock.printToMatrix()
+
 		
 
 

@@ -63,12 +63,10 @@ class Stock:
 
 def main():
 	
-
 	# alpha vantage free api gives us 5 calls per minute, but we may not need that many
 	opsPerMin = min(5, len(symbols)) 
 	def stockUpdater():
 		stockIndex = 0
-		numStocks = len(symbols)
 		while True:
 			i = 0
 			for i in range(opsPerMin):
@@ -84,6 +82,7 @@ def main():
 			time.sleep(70)
 
 	dataThread = threading.Thread(target = stockUpdater)
+	dataThread.daemon = True
 	dataThread.start()
 	while True:
 		for stock in stocks:
@@ -95,5 +94,6 @@ def handler(signal_recieved, frame):
 	print("SIGINT or CTR_-C detected. Exiting")
 	exit(0)
 
-main()
+if __name__ == '__main__':
+	main()
 

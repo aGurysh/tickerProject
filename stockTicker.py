@@ -5,7 +5,7 @@ import time
 import threading
 from signal import signal, SIGINT
 from sys import exit
-
+from imageBuilder import ImageBuilder
 #API key here
 api_key = '5U7U9846S47BG8CE'
 
@@ -21,45 +21,36 @@ stocks = [] #list of stock objects
 
 #Stock object, each call to  constructor will make 1 API Call
 class Stock:
-	def __init__(self, ticker):
-		self.ticker = ticker
-		self.data, self.meta_data = ts.get_quote_endpoint(symbol = self.ticker)
+	def __init__(self, symbol):
+		self.symbol = symbol
+		self.data, self.meta_data = ts.get_quote_endpoint(symbol = self.symbol)
 		self.price = "".join(str(self.data['05. price'])[16:].strip())[:-3]
 		self.change = "".join(str(self.data['09. change']))[16:].strip()[:-3]
-		print(self.ticker)
+		if self.change[0] == '-':
+			self.color = (255, 0,0)
+		else:
+			self.color = (0,255,0)
+		print(self.symbol)
 		print("Create")
 		print(self.change)
 	def getPrice(self):
 		return self.price
 	def getChange(self):
 		return self.change
+	def getColor(self):
+		return self.color
 	def update(self):
-		self.data, self.meta_data = ts.get_quote_endpoint(symbol = self.ticker)
+		self.data, self.meta_data = ts.get_quote_endpoint(symbol = self.symbol)
 		self.price = "".join(str(self.data['05. price'])[16:].strip())[:-3]
 		self.change = "".join(str(self.data['09. change']))[16:].strip()[:-3]
-		print(self.ticker)
+		if self.change[0] == '-':
+			self.color = (255, 0,0)
+		else:
+			self.color = (0,255,0)
+		print(self.symbol)
 		print("UPDATE")
 		print(self.price)
-	def printToMatrix(self):
-		priceString = "sudo ./scrolling-text-example -y -2 -l 1  -f helvetica.bdf --led-rows 16 --led-cols 64 -s 3  "
-		changeString = "sudo ./scrolling-text-example -y -2 -l 1 -f helvetica.bdf --led-rows 16 --led-cols 64 -s 3 "
-		tickerString = "sudo ./scrolling-text-example -y -2 -l 1 -f helvetica.bdf --led-rows 16 --led-cols 64 -s 2 -C 0,0,255 "
-		if(self.change[0] == "-"):
-			priceString += "-C 255,0,0 "
-			changeString += "-C 255,0,0 "
-		else:
-			priceString += "-C 0,255,0 "
-			changeString += "-C 0,255,0 "
-
-		tickerString += self.ticker
-		tickerString += " "
-		tickerString += self.price
-		
-		changeString += " Daily Change "
-		changeString += self.change[1:]
-		
-		os.system(tickerString)		
-		os.system(changeString)
+	
 
 def main():
 	
@@ -86,10 +77,21 @@ def main():
 	dataThread = threading.Thread(target = stockUpdater)
 	dataThread.daemon = True
 	dataThread.start()
+
+	
 	
 	while True:
+		builder = ImageBuilder(1000)
+
 		for stock in stocks:
-			stock.printToMatrix()
+			builder.addImage(stock.symbol, (0,255,255))
+			builder.addImage(stock.price, stock.color)
+
+		os.system("sudo python scrolling-image.py -l 1")
+
+
+
+		
 
 		
 

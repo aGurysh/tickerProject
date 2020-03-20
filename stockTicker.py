@@ -7,13 +7,13 @@ from signal import signal, SIGINT
 from sys import exit
 from imageBuilder import ImageBuilder
 #API key here
-api_key = '5U7U9846S47BG8CE'
+api_key = 'YOUR_API_KEY'
 
 #create our timeseries object 
 ts = TimeSeries(key=api_key, output_format='pandas')
 
 
-symbols = ["INTC", "AMD", "MSFT"]
+symbols = ["INTC", "AMD", "MSFT"]  #add your symbols here
 stocks = [] #list of stock objects
 
 
